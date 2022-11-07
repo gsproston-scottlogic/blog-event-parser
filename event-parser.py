@@ -1,7 +1,12 @@
 import sys
 import xml.etree.ElementTree as et
 
+from event import Event
+
 def parseEventXml(inputFile):
+  # list of events
+  events = []
+
   # parse input file
   tree = et.parse(inputFile)
   root = tree.getroot()
@@ -24,6 +29,13 @@ def parseEventXml(inputFile):
     description = description.replace("]]>", "")
     # remove leading and trailing whitespace
     description = description.strip()
+
+    # create event object
+    event = Event(title, link, pubDate, guid, speakers, eventDate, description)
+    events.append(event)
+
+  # return the list of events
+  return events
 
 if __name__ == "__main__": 
   # must have two arguments
