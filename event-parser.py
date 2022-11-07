@@ -76,7 +76,7 @@ def writeEventToFile(event: Event, outputDir):
   if (len(event.speakers) > 0):
     f.write("\nspeakers:")
     for speaker in event.speakers: 
-      f.write("\n\t- ")
+      f.write("\n  - ")
       f.write(speaker)
   f.write("\n---\n\n")
   # body
