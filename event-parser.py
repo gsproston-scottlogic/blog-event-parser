@@ -1,4 +1,3 @@
-import codecs
 import datetime
 import os
 import re
