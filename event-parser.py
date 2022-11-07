@@ -1,4 +1,7 @@
+import codecs
 import datetime
+import os
+import re
 import sys
 import xml.etree.ElementTree as et
 
@@ -28,7 +31,8 @@ def parseEventXml(inputFile):
     # get all the speakers
     speakers = []
     for speaker in item.findall("event_speaker/ul/li"): 
-      speakers.append(speaker.text)
+      if (speaker != None and speaker.text != None):
+        speakers.append(speaker.text)
 
     # parse out the description
     description = item.find("description").text
@@ -45,9 +49,41 @@ def parseEventXml(inputFile):
   # return the list of events
   return events
 
-def writeEventToFile(event): 
-  # create title
-  pass
+def writeEventToFile(event: Event, outputDir): 
+  # create file name from event date and title
+  fileName = event.title
+  # convert to lowercase
+  fileName = str.lower(fileName)
+  # remove symbols from the title
+  fileName = re.sub(r'[^\w ]', '', fileName)
+  # replace spaces with dashes
+  fileName = fileName.replace(" ", "-")
+  # prepend with the date
+  fileName = event.eventDate.strftime("%Y-%m-%d-") + fileName
+  # add the 'md' extension
+  fileName = fileName + ".md"
+
+  # open file for writing
+  pathToFile = os.path.join(outputDir, fileName)
+  f = open(pathToFile, "w", encoding="utf-8")
+  # header
+  f.write("---")
+  f.write("\ntitle: " + event.title)
+  f.write("\nlink: " + event.link)
+  f.write("\nguid: " + event.guid)
+  f.write("\neventDate: " + event.eventDate.strftime("%Y-%m-%d"))
+  f.write("\npubDateTime: " + event.pubDateTime.strftime("%Y-%m-%d %H:%M:%S %z"))
+  # speakers
+  if (len(event.speakers) > 0):
+    f.write("\nspeakers:")
+    for speaker in event.speakers: 
+      f.write("\n\t- ")
+      f.write(speaker)
+  f.write("\n---\n\n")
+  # body
+  f.write(event.description)
+  # done writing
+  f.close()
 
 if __name__ == "__main__": 
   # must have two arguments
@@ -64,6 +100,6 @@ if __name__ == "__main__":
 
   events = parseEventXml(inputFile)
   for event in events:
-    writeEventToFile(event)
+    writeEventToFile(event, outputDir)
 
 exit(0)
