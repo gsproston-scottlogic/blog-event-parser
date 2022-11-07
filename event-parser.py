@@ -18,6 +18,8 @@ def parseEventXml(inputFile):
     title = item.find("title").text
     link = item.find("link").text
     guid = item.find("guid").text
+    # escape quotes in the title
+    title = title.replace("\"", "\"\"")
 
     # parse out datetimes
     eventDateStr = item.find("events_date").text
@@ -67,7 +69,7 @@ def writeEventToFile(event: Event, outputDir):
   f = open(pathToFile, "w", encoding="utf-8")
   # header
   f.write("---")
-  f.write("\ntitle: " + event.title)
+  f.write("\ntitle: \"" + event.title + "\"")
   f.write("\nlink: " + event.link)
   f.write("\nguid: " + event.guid)
   f.write("\neventDate: " + event.eventDate.strftime("%Y-%m-%d"))
