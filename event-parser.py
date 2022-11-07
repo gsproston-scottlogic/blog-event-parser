@@ -1,39 +1,43 @@
 import sys
 import xml.etree.ElementTree as et
 
-# must have two arguments
-if (len(sys.argv) < 3):
-  print("Must be given two arguments")
-  exit(1)
+def parseEventXml(inputFile):
+  # parse input file
+  tree = et.parse(inputFile)
+  root = tree.getroot()
+  for item in root.findall("./channel/item"):
+    title = item.find("title").text
+    link = item.find("link").text
+    pubDate = item.find("pubDate").text
+    guid = item.find("guid").text
+    eventDate = item.find("events_date").text
 
-# get the input file and output directory
-inputFile = sys.argv[1]
-outputDir = sys.argv[2]
+    # get all the speakers
+    speakers = []
+    for speaker in item.findall("event_speaker/ul/li"): 
+      speakers.append(speaker.text)
 
-print("Input file: " + inputFile)
-print("Output directory: " + outputDir)
+    # parse out the description
+    description = item.find("description").text
+    # remove start and end tags
+    description = description.replace("<![CDATA[", "")
+    description = description.replace("]]>", "")
+    # remove leading and trailing whitespace
+    description = description.strip()
 
-# parse input file
-tree = et.parse(inputFile)
-root = tree.getroot()
-for item in root.findall("./channel/item"):
-  title = item.find("title").text
-  link = item.find("link").text
-  pubDate = item.find("pubDate").text
-  guid = item.find("guid").text
-  eventDate = item.find("events_date").text
+if __name__ == "__main__": 
+  # must have two arguments
+  if (len(sys.argv) < 3):
+    print("Must be given two arguments")
+    exit(1)
 
-  # get all the speakers
-  speakers = []
-  for speaker in item.findall("event_speaker/ul/li"): 
-    speakers.append(speaker.text)
+  # get the input file and output directory
+  inputFile = sys.argv[1]
+  outputDir = sys.argv[2]
 
-  # parse out the description
-  description = item.find("description").text
-  # remove start and end tags
-  description = description.replace("<![CDATA[", "")
-  description = description.replace("]]>", "")
-  # remove leading and trailing whitespace
-  description = description.strip()
+  print("Input file: " + inputFile)
+  print("Output directory: " + outputDir)
+
+  events = parseEventXml(inputFile)
 
 exit(0)
